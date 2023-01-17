@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Helpers\ResponseFormatter;
-use App\Http\Controllers\Controller;
+
+use App\Http\Controllers\ApiController;
 use App\Http\Requests\CreateCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
 use App\Models\Company;
@@ -12,7 +12,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class CompanyController extends Controller
+class CompanyController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -33,16 +33,16 @@ class CompanyController extends Controller
             $company = $companyQuery->find($id);
 
             if ($company) {
-                return ResponseFormatter::sendResponse($company, 'Company is found.');
+                return $this->successResponse($company, 'Company is found.');
             }
-            return ResponseFormatter::sendError('Company is not found.', 404);
+            return $this->errorResponse('Company is not found.', 404);
         }
 
         $companies = $companyQuery;
         if ($name) {
             $companies->where('name', 'like', '%' . $name . '%')->paginate($limit);
         }
-        return ResponseFormatter::sendResponse($companies, 'Companies are found.');
+        return $this->successResponse($companies, 'Companies are found.');
     }
 
     /**
@@ -71,9 +71,9 @@ class CompanyController extends Controller
 
             $company->load('users');
 
-            return ResponseFormatter::sendResponse($company, 'Company successfully created.');
+            return $this->successResponse($company, 'Company successfully created.');
         } catch (Exception $e) {
-            return ResponseFormatter::sendResponse($e->getMessage(), 500);
+            return $this->successResponse($e->getMessage(), 500);
         }
     }
 
@@ -100,9 +100,9 @@ class CompanyController extends Controller
                 'name' => $request->name,
                 'logo' => isset($path) ? $path : $company->logo
             ]);
-            return ResponseFormatter::sendResponse($company, 'Company has been updated.');
+            return $this->successResponse($company, 'Company has been updated.');
         } catch (Exception $e) {
-            return ResponseFormatter::sendError($e->getMessage(), 500);
+            return $this->errorResponse($e->getMessage(), 500);
         }
     }
 }

@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Helpers\ResponseFormatter;
-use App\Http\Controllers\Controller;
+
+use App\Http\Controllers\ApiController;
 use App\Http\Requests\CreateRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
 use App\Models\Role;
 use Exception;
 use Illuminate\Http\Request;
 
-class RoleController extends Controller
+class RoleController extends ApiController
 {
     public function fetch(Request $request)
     {
@@ -25,9 +25,9 @@ class RoleController extends Controller
             $role = $roleQuery->with('responsibilities')->find($id);
 
             if ($role) {
-                return ResponseFormatter::sendResponse($role, 'Role found');
+                return $this->successResponse($role, 'Role found');
             }
-            return ResponseFormatter::sendError('Role not found', 404);
+            return $this->errorResponse('Role not found', 404);
         }
 
         $roles = $roleQuery->where('company_id', $request->company_id);
@@ -40,7 +40,7 @@ class RoleController extends Controller
             $roles->with('responsibilities');
         }
 
-        return ResponseFormatter::sendResponse($roles->paginate($limit), 'Roles found');
+        return $this->successResponse($roles->paginate($limit), 'Roles found');
     }
 
     public function create(CreateRoleRequest $request)
@@ -55,9 +55,9 @@ class RoleController extends Controller
                 throw new Exception('Role not created');
             }
 
-            return ResponseFormatter::sendResponse($role, 'Role created');
+            return $this->successResponse($role, 'Role created');
         } catch (Exception $e) {
-            return ResponseFormatter::sendError($e->getMessage(), 500);
+            return $this->errorResponse($e->getMessage(), 500);
         }
     }
 
@@ -75,9 +75,9 @@ class RoleController extends Controller
                 'company_id' => $request->company_id,
             ]);
 
-            return ResponseFormatter::sendResponse($role, 'Role updated');
+            return $this->successResponse($role, 'Role updated');
         } catch (Exception $e) {
-            return ResponseFormatter::sendError($e->getMessage(), 500);
+            return $this->errorResponse($e->getMessage(), 500);
         }
     }
 
@@ -92,9 +92,9 @@ class RoleController extends Controller
 
             $role->delete();
 
-            return ResponseFormatter::sendResponse('Role deleted');
+            return $this->successResponse('Role deleted');
         } catch (Exception $e) {
-            return ResponseFormatter::sendError($e->getMessage(), 500);
+            return $this->errorResponse($e->getMessage(), 500);
         }
     }
 }

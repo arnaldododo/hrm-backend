@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Helpers\ResponseFormatter;
-use App\Http\Controllers\Controller;
+
+use App\Http\Controllers\ApiController;
 use App\Http\Requests\CreateResponsibilityRequest;
 use App\Models\Responsibility;
 use Exception;
 use Illuminate\Http\Request;
 
-class ResponsibilityController extends Controller
+class ResponsibilityController extends ApiController
 {
     public function fetch(Request $request)
     {
@@ -23,10 +23,10 @@ class ResponsibilityController extends Controller
             $responsibility = $responsibilityQuery->find($id);
 
             if ($responsibility) {
-                return ResponseFormatter::sendResponse($responsibility, 'Responsibility found');
+                return $this->successResponse($responsibility, 'Responsibility found');
             }
 
-            return ResponseFormatter::sendError('Responsibility not found', 404);
+            return $this->errorResponse('Responsibility not found', 404);
         }
 
         $responsibilities = $responsibilityQuery->where('role_id', $request->role_id);
@@ -35,7 +35,7 @@ class ResponsibilityController extends Controller
             $responsibilities->where('name', 'like', '%' . $name . '%')->paginate($limit);
         }
 
-        return ResponseFormatter::sendResponse($responsibilities, 'Responsibilities found');
+        return $this->successResponse($responsibilities, 'Responsibilities found');
     }
 
     public function create(CreateResponsibilityRequest $request)
@@ -51,9 +51,9 @@ class ResponsibilityController extends Controller
                 throw new Exception('Responsibility not created');
             }
 
-            return ResponseFormatter::sendResponse($responsibility, 'Responsibility created');
+            return $this->successResponse($responsibility, 'Responsibility created');
         } catch (Exception $e) {
-            return ResponseFormatter::sendError($e->getMessage(), 500);
+            return $this->errorResponse($e->getMessage(), 500);
         }
     }
 
@@ -68,9 +68,9 @@ class ResponsibilityController extends Controller
 
             $responsibility->delete();
 
-            return ResponseFormatter::sendResponse('Responsibility deleted');
+            return $this->successResponse('Responsibility deleted');
         } catch (Exception $e) {
-            return ResponseFormatter::sendError($e->getMessage(), 500);
+            return $this->errorResponse($e->getMessage(), 500);
         }
     }
 }

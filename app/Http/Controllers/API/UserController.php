@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Helpers\ResponseFormatter;
-use App\Http\Controllers\Controller;
+
+use App\Http\Controllers\ApiController;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Models\User;
@@ -11,7 +11,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-class UserController extends Controller
+class UserController extends ApiController
 {
     /**
      * Validate user log in
@@ -28,13 +28,13 @@ class UserController extends Controller
 
             $token = $user->createToken('authToken')->plainTextToken;
 
-            return ResponseFormatter::sendResponse([
+            return $this->successResponse([
                 'access_token' => $token,
                 'token_type' => 'Bearer',
                 'user' => $user
             ], 'Login successful.');
         } catch (Exception $e) {
-            return ResponseFormatter::sendError($e->getMessage());
+            return $this->errorResponse($e->getMessage());
         }
     }
 
@@ -54,13 +54,13 @@ class UserController extends Controller
 
             $token = $user->createToken('authToken')->plainTextToken;
 
-            return ResponseFormatter::sendResponse([
+            return $this->successResponse([
                 'access_token' => $token,
                 'token_type' => 'Bearer',
                 'user' => $user
             ], 'Register successful.');
         } catch (Exception $e) {
-            return ResponseFormatter::sendError($e->getMessage());
+            return $this->errorResponse($e->getMessage());
         }
     }
 
@@ -73,7 +73,7 @@ class UserController extends Controller
     {
         $token = $request->user()->currentAccessToken()->delete();
 
-        return ResponseFormatter::sendResponse($token, 'Logout successful.');
+        return $this->successResponse($token, 'Logout successful.');
     }
 
     /**
@@ -85,6 +85,6 @@ class UserController extends Controller
     {
         $user = $request->user();
 
-        return ResponseFormatter::sendResponse($user, 'Fetch successful.');
+        return $this->successResponse($user, 'Fetch successful.');
     }
 }

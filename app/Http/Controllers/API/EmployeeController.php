@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Helpers\ResponseFormatter;
-use App\Http\Controllers\Controller;
+
+use App\Http\Controllers\ApiController;
 use App\Http\Requests\CreateEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Models\Employee;
 use Exception;
 use Illuminate\Http\Request;
 
-class EmployeeController extends Controller
+class EmployeeController extends ApiController
 {
     public function fetch(Request $request)
     {
@@ -31,9 +31,9 @@ class EmployeeController extends Controller
             $employee = $employeeQuery->with(['team', 'role'])->find($id);
 
             if ($employee) {
-                return ResponseFormatter::sendResponse($employee, 'Employee found');
+                return $this->successResponse($employee, 'Employee found');
             }
-            return ResponseFormatter::sendError('Employee not found', 404);
+            return $this->errorResponse('Employee not found', 404);
         }
 
         $employees = $employeeQuery;
@@ -62,7 +62,7 @@ class EmployeeController extends Controller
             });
         }
 
-        return ResponseFormatter::sendResponse($employees->paginate($limit), 'Employees found');
+        return $this->successResponse($employees->paginate($limit), 'Employees found');
     }
 
     public function create(CreateEmployeeRequest $request)
@@ -87,9 +87,9 @@ class EmployeeController extends Controller
                 throw new Exception('Employee not created');
             }
 
-            return ResponseFormatter::sendResponse($employee, 'Employee created successfully');
+            return $this->successResponse($employee, 'Employee created successfully');
         } catch (Exception $e) {
-            return ResponseFormatter::sendError($e->getMessage(), 500);
+            return $this->errorResponse($e->getMessage(), 500);
         }
     }
 
@@ -117,9 +117,9 @@ class EmployeeController extends Controller
                 'role_id' => $request->role_id
             ]);
 
-            return ResponseFormatter::sendResponse($employee, 'Employee updated');
+            return $this->successResponse($employee, 'Employee updated');
         } catch (Exception $e) {
-            return ResponseFormatter::sendError($e->getMessage(), 500);
+            return $this->errorResponse($e->getMessage(), 500);
         }
     }
 
@@ -134,9 +134,9 @@ class EmployeeController extends Controller
 
             $employee->delete();
 
-            return ResponseFormatter::sendResponse('Employee deleted');
+            return $this->successResponse('Employee deleted');
         } catch (Exception $e) {
-            return ResponseFormatter::sendError($e->getMessage(), 500);
+            return $this->errorResponse($e->getMessage(), 500);
         }
     }
 }
